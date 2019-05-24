@@ -23,6 +23,7 @@ namespace Laboratorio_9
         List<Button> listaBotones;
         Button[,] matrizBotones;
         bool[,] bombmons;
+        int time;
 
         public Form1()
         {
@@ -42,14 +43,20 @@ namespace Laboratorio_9
                     button.Margin = new Padding(0, 0, 0, 0);
                     button.Padding = new Padding(0, 0, 0, 0);
                     button.FlatStyle = FlatStyle.Popup;
-                    button.FlatAppearance.BorderSize = 1;
                     button.Click += cell_Click;
+                    button.BackColor = Color.LightGray;
+                    button.FlatAppearance.BorderSize = 0;
                     tableLayoutPanel1.Controls.Add(button, columna, fila);
                     matrizBotones[fila, columna] = button;
                     listaBotones.Add(button);
                 }
             }
 
+            configurarBombmons();
+        }
+
+        private void configurarBombmons()
+        {
             // Bombmons
             for (int fila = 0; fila < FILAS; fila++)
                 for (int columna = 0; columna < COLUMNAS; columna++)
@@ -70,6 +77,20 @@ namespace Laboratorio_9
                     creados++;
                 }
             }
+
+            // Reiniciamos los botones (ya que algunos pueden estar con color verde o deshabilitados)
+            for (int fila = 0; fila < FILAS; fila++)
+                for (int columna = 0; columna < COLUMNAS; columna++)
+                {
+                    matrizBotones[fila, columna].BackColor = Color.LightGray;
+                    matrizBotones[fila, columna].Enabled = true;
+                    //matrizBotones[fila, columna].Text = "";
+                }
+
+            // Comenzamos el timer
+            timer.Start();
+            time = 0;
+            ActualizarTextoReloj();
         }
 
         private void cell_Click(object sender, EventArgs e)
@@ -97,6 +118,7 @@ namespace Laboratorio_9
             {
                 MostrarBombmons(true);
                 DeshabilitarBotones();
+                PausarTiempo();
                 MessageBox.Show("Perdiste!! :c");
             }
             else
@@ -112,8 +134,14 @@ namespace Laboratorio_9
             {
                 MostrarBombmons(false);
                 DeshabilitarBotones();
-                MessageBox.Show("Yuhuuu!! Ganaste!!");
+                PausarTiempo();
+                MessageBox.Show($"Yuhuuu!! Ganaste!! Te demoraste {timeText.Text}");
             }
+        }
+
+        private void PausarTiempo()
+        {
+            timer.Stop();
         }
 
         private bool Gana()
@@ -175,6 +203,30 @@ namespace Laboratorio_9
                 }
             }
             return cantidad;
+        }
+
+        private void resetButton_Click(object sender, EventArgs e)
+        {
+            var confirmResult = MessageBox.Show("¿Quieres reiniciar tu juego?", "Reiniciar", MessageBoxButtons.YesNo);
+            if (confirmResult == DialogResult.Yes)
+            {
+                configurarBombmons();
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            time += 1;
+            ActualizarTextoReloj();
+        }
+
+        private void ActualizarTextoReloj()
+        {
+            int minutos = time / 60;
+            int segundos = time - minutos * 60;
+            string textoMinutos = minutos >= 10 ? minutos.ToString() : "0" + minutos;
+            string textoSegundos = segundos >= 10 ? segundos.ToString() : "0" + segundos;
+            timeText.Text = $"{textoMinutos}:{textoSegundos}";
         }
     }
 }
