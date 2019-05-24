@@ -61,7 +61,7 @@ namespace Laboratorio_9
                 if (!existeUnBombmon)
                 {
                     bombmons[fila, columna] = true;
-                    buttons[fila, columna].Text = "b";
+                    // buttons[fila, columna].Text = "b"; // solo para probar
                     creados++;
                 }
             }
