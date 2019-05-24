@@ -17,16 +17,20 @@ namespace Laboratorio_9
         private const int FILAS = 8;
         private const int COLUMNAS = 8;
 
+        private const int BOMBMONS = 10;
+
         // Información de cada celda
-        Button[,] buttons;
+        List<Button> listaBotones;
+        Button[,] matrizBotones;
         bool[,] bombmons;
 
         public Form1()
         {
             InitializeComponent();
 
-            buttons = new Button[FILAS, COLUMNAS];
+            matrizBotones = new Button[FILAS, COLUMNAS];
             bombmons = new bool[FILAS, COLUMNAS];
+            listaBotones = new List<Button>();
 
             // Agregaremos los botones con código, para no hacerlo 1 a 1...
             for(int fila = 0; fila < FILAS; fila++)
@@ -41,7 +45,8 @@ namespace Laboratorio_9
                     button.FlatAppearance.BorderSize = 1;
                     button.Click += cell_Click;
                     tableLayoutPanel1.Controls.Add(button, columna, fila);
-                    buttons[fila, columna] = button;
+                    matrizBotones[fila, columna] = button;
+                    listaBotones.Add(button);
                 }
             }
 
@@ -53,7 +58,7 @@ namespace Laboratorio_9
             // Creamos los 10 bombmons al azar
             Random random = new Random();
             int creados = 0;
-            while(creados < 10)
+            while(creados < BOMBMONS)
             {
                 int fila = random.Next(FILAS);
                 int columna = random.Next(COLUMNAS);
@@ -61,7 +66,7 @@ namespace Laboratorio_9
                 if (!existeUnBombmon)
                 {
                     bombmons[fila, columna] = true;
-                    // buttons[fila, columna].Text = "b"; // solo para probar
+                    matrizBotones[fila, columna].Text = "b"; // solo para probar
                     creados++;
                 }
             }
@@ -78,7 +83,7 @@ namespace Laboratorio_9
             {
                 for (int columna = 0; columna < COLUMNAS; columna++)
                 {
-                    if (boton == buttons[fila, columna])
+                    if (boton == matrizBotones[fila, columna])
                     {
                         filaBoton = fila;
                         columnaBoton = columna;
@@ -90,7 +95,7 @@ namespace Laboratorio_9
             // Vemos si en la posición existe un bombmon
             if (ExisteBombmon(filaBoton, columnaBoton))
             {
-                MostrarBombmons();
+                MostrarBombmons(true);
                 DeshabilitarBotones();
                 MessageBox.Show("Perdiste!! :c");
             }
@@ -101,6 +106,20 @@ namespace Laboratorio_9
                 boton.BackColor = Color.Green;
                 boton.Text = ContarBombmons(filaBoton, columnaBoton).ToString();
             }
+
+            // Verificamos si ganamos
+            if (Gana())
+            {
+                MostrarBombmons(false);
+                DeshabilitarBotones();
+                MessageBox.Show("Yuhuuu!! Ganaste!!");
+            }
+        }
+
+        private bool Gana()
+        {
+            int botonesVerdes = listaBotones.Where(button => button.BackColor == Color.Green).Count();
+            return botonesVerdes + BOMBMONS == FILAS * COLUMNAS;
         }
 
         private bool ExisteBombmon(int fila, int columna)
@@ -108,7 +127,7 @@ namespace Laboratorio_9
             return bombmons[fila, columna];
         }
 
-        private void MostrarBombmons()
+        private void MostrarBombmons(bool perdio)
         {
             for (int fila = 0; fila < FILAS; fila++)
             {
@@ -116,7 +135,9 @@ namespace Laboratorio_9
                 {
                     if (bombmons[fila, columna])
                     {
-                        buttons[fila, columna].BackColor = Color.Red;
+                        matrizBotones[fila, columna].BackColor = Color.Red;
+                        if (perdio)
+                            matrizBotones[fila, columna].Text = "💣";
                     }
                 }
             }
@@ -128,7 +149,7 @@ namespace Laboratorio_9
             {
                 for (int columna = 0; columna < COLUMNAS; columna++)
                 {
-                    buttons[fila, columna].Enabled = false;
+                    matrizBotones[fila, columna].Enabled = false;
                 }
             }
         }
