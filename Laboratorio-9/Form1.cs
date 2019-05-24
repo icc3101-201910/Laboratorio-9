@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Laboratorio_9
 {
@@ -136,6 +137,7 @@ namespace Laboratorio_9
                 DeshabilitarBotones();
                 PausarTiempo();
                 MessageBox.Show($"Yuhuuu!! Ganaste!! Te demoraste {timeText.Text}");
+                File.AppendAllText("tiempos.txt", $"{time}\n");
             }
         }
 
@@ -227,6 +229,12 @@ namespace Laboratorio_9
             string textoMinutos = minutos >= 10 ? minutos.ToString() : "0" + minutos;
             string textoSegundos = segundos >= 10 ? segundos.ToString() : "0" + segundos;
             timeText.Text = $"{textoMinutos}:{textoSegundos}";
+        }
+
+        private void rankingButton_Click(object sender, EventArgs e)
+        {
+            Form form = new Ranking();
+            form.Show();
         }
     }
 }
