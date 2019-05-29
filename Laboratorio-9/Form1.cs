@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 
@@ -13,10 +10,9 @@ namespace Laboratorio_9
 {
     public partial class Form1 : Form
     {
-        // Atributos para guardar filas y columnas, constante para no
-        // poder alterar su valor
-        private const int FILAS = 8;
-        private const int COLUMNAS = 8;
+        // Atributos para guardar filas y columnas
+        private int FILAS;
+        private int COLUMNAS;
 
         private const int BOMBMONS = 10;
 
@@ -25,17 +21,20 @@ namespace Laboratorio_9
         Button[,] matrizBotones;
         bool[,] bombmons;
         int time;
+        TableLayoutPanel gameTableLayout;
 
         public Form1()
         {
             InitializeComponent();
+
+            configurarTableLayout();
 
             matrizBotones = new Button[FILAS, COLUMNAS];
             bombmons = new bool[FILAS, COLUMNAS];
             listaBotones = new List<Button>();
 
             // Agregaremos los botones con código, para no hacerlo 1 a 1...
-            for(int fila = 0; fila < FILAS; fila++)
+            for (int fila = 0; fila < FILAS; fila++)
             {
                 for(int columna = 0; columna < COLUMNAS; columna++)
                 {
@@ -47,13 +46,49 @@ namespace Laboratorio_9
                     button.Click += cell_Click;
                     button.BackColor = Color.LightGray;
                     button.FlatAppearance.BorderSize = 0;
-                    tableLayoutPanel1.Controls.Add(button, columna, fila);
+                    gameTableLayout.Controls.Add(button, columna, fila);
                     matrizBotones[fila, columna] = button;
                     listaBotones.Add(button);
                 }
             }
 
             configurarBombmons();
+        }
+
+        private void configurarTableLayout()
+        {
+            gameTableLayout = new TableLayoutPanel();
+
+            // Será una matriz cuadrada de DIMENSIONES x DIMENSIONES
+            int DIMENSIONES = 16;
+
+            // Modificamos las filas y columnas del tableLayout
+            gameTableLayout.RowCount = DIMENSIONES;
+            gameTableLayout.ColumnCount = DIMENSIONES;
+
+            // Estas constantes es para que sea más fácil de leer el código solamente
+            FILAS = DIMENSIONES;
+            COLUMNAS = DIMENSIONES;
+
+            // Quiero que sea de más o menos 300x300
+            // Hago esto para que el tamaño de todos los botones sea el mismo.
+            // WindowsForms hace algo raro con la última columna y última fila
+            // cuando estos valores no calzan bien...
+            int tamanoBoton = (int)Math.Round(300.0 / DIMENSIONES);
+            int tamanoTabla = tamanoBoton * DIMENSIONES;
+
+            for (var i = 0; i < COLUMNAS; i++)
+                gameTableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, tamanoBoton));
+
+            for (var i = 0; i < FILAS; i++)
+                gameTableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, tamanoBoton));
+
+            gameTableLayout.Size = new Size(tamanoTabla, tamanoTabla);
+
+            // Lo siguiente centra la tabla
+            gameTableLayout.Anchor = AnchorStyles.None;
+
+            tableLayoutPanel2.Controls.Add(gameTableLayout, 0, 1);
         }
 
         private void configurarBombmons()
@@ -85,7 +120,7 @@ namespace Laboratorio_9
                 {
                     matrizBotones[fila, columna].BackColor = Color.LightGray;
                     matrizBotones[fila, columna].Enabled = true;
-                    //matrizBotones[fila, columna].Text = "";
+                    matrizBotones[fila, columna].Text = "";
                 }
 
             // Comenzamos el timer
